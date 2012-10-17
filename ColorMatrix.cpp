@@ -173,6 +173,7 @@ ColorMatrix::ColorMatrix(const VSNodeRef *_child, const char* _mode, int _source
         }
         VSMap *args = vsapi->newMap();
         vsapi->propSetNode(args, "clip", child, 0);
+        vsapi->propSetInt(args, "tff", 1, 0);
         VSMap *ret = vsapi->invoke(findPlugin, "SeparateFields", args);
         child = vsapi->propGetNode(ret, "clip", 0, 0);
         vi.numFrames *= 2;
@@ -1091,7 +1092,7 @@ void VS_CC Create_ColorMatrix(const VSMap *in, VSMap *out, void *userData, VSCor
     {
         ColorMatrix *instance = new ColorMatrix(return_clip, mode, source, dest, clamp, interlaced, inputFR,
                                                 outputFR, hints, d2v, debug, threads, thrdmthd, opt, vsapi, core);
-        const VSNodeRef *cref = vsapi->createFilter(in, out, "colormatrix", ColorMatrix::ColorMatrixInit, ColorMatrix::ColorMatrixGetFrame, ColorMatrix::ColorMatrixFree, fmSerial, nfNoCache, instance, core);
+        const VSNodeRef *cref = vsapi->createFilter(in, out, "colormatrix", ColorMatrix::ColorMatrixInit, ColorMatrix::ColorMatrixGetFrame, ColorMatrix::ColorMatrixFree, fmSerial, 0, instance, core);
 
         if (interlaced) // interlaced
         {
@@ -1102,6 +1103,7 @@ void VS_CC Create_ColorMatrix(const VSMap *in, VSMap *out, void *userData, VSCor
             }
             VSMap *args = vsapi->newMap();
             vsapi->propSetNode(args, "clip", cref, 0);
+            vsapi->propSetInt(args, "tff", 1, 0);
             VSMap *ret = vsapi->invoke(findPlugin, "DoubleWeave", args);
             cref = vsapi->propGetNode(ret, "clip", 0, 0);
             vsapi->clearMap(args);
