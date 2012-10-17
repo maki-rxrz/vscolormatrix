@@ -25,12 +25,15 @@
 **   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#ifdef _WIN32
 #include <windows.h>
-#include <xmmintrin.h>
 #include <process.h>
+#endif
+#include <xmmintrin.h>
 #include <cfloat>
 #include <cstdio>
 #include <stdexcept>
+#include <algorithm>
 #include "VapourSynth.h"
 #include "vshelper.h"
 
@@ -65,7 +68,7 @@
     n == 14 ? "SMPTE 240M->Rec.601" : \
     "unknown"
 #define ns(n) n < 0 ? int(n*65536.0-0.5+DBL_EPSILON) : int(n*65536.0+0.5)
-#define CB(n) max(min((n),255),0)
+#define CB(n) (std::max)((std::min)((n),255),0)
 #define simd_scale(n) n >= 65536 ? (n+2)>>2 : n >= 32768 ? (n+1)>>1 : n;
 
 static double yuv_coeffs_luma[4][3] =
@@ -76,17 +79,17 @@ static double yuv_coeffs_luma[4][3] =
     +0.7010, +0.0870, +0.2120, // SMPTE 240M (3)
 };
 
-__declspec(align(16)) const __int64 Q32[2] = { 0x0020002000200020, 0x0020002000200020 };
-__declspec(align(16)) const __int64 Q64[2] = { 0x0040004000400040, 0x0040004000400040 };
-__declspec(align(16)) const __int64 Q128[2] = { 0x0080008000800080, 0x0080008000800080 };
-__declspec(align(16)) const __int64 Q8224[2] = { 0x2020202020202020, 0x2020202020202020 };
-__declspec(align(16)) const __int64 Q8 = 0x0000000000000008;
+__declspec(align(16)) const int64_t Q32[2] = { 0x0020002000200020, 0x0020002000200020 };
+__declspec(align(16)) const int64_t Q64[2] = { 0x0040004000400040, 0x0040004000400040 };
+__declspec(align(16)) const int64_t Q128[2] = { 0x0080008000800080, 0x0080008000800080 };
+__declspec(align(16)) const int64_t Q8224[2] = { 0x2020202020202020, 0x2020202020202020 };
+__declspec(align(16)) const int64_t Q8 = 0x0000000000000008;
 
 struct CFS {
     int c1, c2, c3, c4;
     int c5, c6, c7, c8;
     int n, modef;
-    long cpu;
+    int64_t cpu;
     bool debug;
 };
 
@@ -128,8 +131,8 @@ enum {
 };
 
 int num_processors();
-unsigned __stdcall processFrame_YUY2(void *ps);
-unsigned __stdcall processFrame_YV12(void *ps);
+unsigned VS_CC processFrame_YUY2(void *ps);
+unsigned VS_CC processFrame_YV12(void *ps);
 void (*find_YV12_SIMD(int modef, bool sse2))(void *ps);
 void conv1_YV12_MMX(void *ps);
 void conv2_YV12_MMX(void *ps);
@@ -143,7 +146,6 @@ void conv4_YV12_SSE2(void *ps);
 class ColorMatrix
 {
 private:
-    char buf[256];
     int yuv_convert[16][3][3];
     const char *mode, *d2v;
     unsigned char *d2vArray;
