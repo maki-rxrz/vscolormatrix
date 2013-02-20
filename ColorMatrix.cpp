@@ -678,6 +678,8 @@ const VSFrameRef *ColorMatrix::getFrame(int n, int activationReason, VSFrameCont
             for (int tc=0; tc<threads; ++tc)
                 WaitForSingleObject(pssInfo[tc]->jobFinished,INFINITE);
         }
+        // Release the source frame
+        vsapi->freeFrame(src);
         return dst;
     }
     return NULL;
