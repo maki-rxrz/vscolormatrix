@@ -153,8 +153,8 @@ private:
     bool inputFR, outputFR;
     int source, dest, modei, clamp;
     int opt, threads, thrdmthd;
-    const VSNodeRef *child;
-    const VSNodeRef *hintClip;
+    VSNodeRef *child;
+    VSNodeRef *hintClip;
     VSVideoInfo vi;
     CFS css;
     unsigned *tids;
@@ -176,7 +176,7 @@ private:
     static int get_num_processors();
 
 public:
-    ColorMatrix(const VSNodeRef *_child, const char* _mode, int _source, int _dest, 
+    ColorMatrix(VSNodeRef *_child, const char* _mode, int _source, int _dest, 
         int _clamp, bool _interlaced, bool _inputFR, bool _outputFR, bool _hints, 
         const char* _d2v, bool _debug, int _threads, int _thrdmthd, int _opt, 
         const VSAPI *vsapi, VSCore *core);

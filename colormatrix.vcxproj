@@ -100,7 +100,7 @@
   <ItemGroup>
     <ClInclude Include="ColorMatrix.h" />
     <ClInclude Include="VapourSynth.h" />
-    <ClInclude Include="vshelper.h" />
+    <ClInclude Include="VSHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ColorMatrix.cpp" />

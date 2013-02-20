@@ -29,7 +29,7 @@
 
 void VS_CC ColorMatrix::ColorMatrixInit(VSMap *in, VSMap *out, void **instanceData, VSNode *node, VSCore *core, const VSAPI *vsapi) {
     ColorMatrix *d = (ColorMatrix *)*instanceData;
-    vsapi->setVideoInfo(&d->vi, node);
+    vsapi->setVideoInfo(&d->vi, 1, node);
 }
 
 void VS_CC ColorMatrix::ColorMatrixFree(void *instanceData, VSCore *core, const VSAPI *vsapi) {
@@ -39,7 +39,7 @@ void VS_CC ColorMatrix::ColorMatrixFree(void *instanceData, VSCore *core, const 
     delete d;
 }
 
-ColorMatrix::ColorMatrix(const VSNodeRef *_child, const char* _mode, int _source, int _dest, int _clamp, 
+ColorMatrix::ColorMatrix(VSNodeRef *_child, const char* _mode, int _source, int _dest, int _clamp, 
     bool _interlaced, bool _inputFR, bool _outputFR, bool _hints, const char* _d2v, bool _debug, 
     int _threads, int _thrdmthd, int _opt, const VSAPI *vsapi, VSCore *core) : child(_child), 
     mode(_mode), source(_source), dest(_dest), clamp(_clamp), interlaced(_interlaced), 
@@ -1021,7 +1021,7 @@ void ColorMatrix::calc_coefficients(const VSAPI *vsapi)
 void VS_CC Create_ColorMatrix(const VSMap *in, VSMap *out, void *userData, VSCore *core, const VSAPI *vsapi) 
 {
     int err;
-    const VSNodeRef *return_clip = vsapi->propGetNode(in, "clip", 0, NULL);
+    VSNodeRef *return_clip = vsapi->propGetNode(in, "clip", 0, NULL);
     const VSVideoInfo *vi = vsapi->getVideoInfo(return_clip);
     const char *mode = vsapi->propGetData(in, "mode", 0, &err);
     if (err)
@@ -1093,7 +1093,8 @@ void VS_CC Create_ColorMatrix(const VSMap *in, VSMap *out, void *userData, VSCor
     {
         ColorMatrix *instance = new ColorMatrix(return_clip, mode, source, dest, clamp, interlaced, inputFR,
             outputFR, hints, d2v, debug, threads, thrdmthd, opt, vsapi, core);
-        const VSNodeRef *cref = vsapi->createFilter(in, out, "colormatrix", ColorMatrix::ColorMatrixInit, ColorMatrix::ColorMatrixGetFrame, ColorMatrix::ColorMatrixFree, fmSerial, 0, instance, core);
+        vsapi->createFilter(in, out, "colormatrix", ColorMatrix::ColorMatrixInit, ColorMatrix::ColorMatrixGetFrame, ColorMatrix::ColorMatrixFree, fmSerial, 0, instance, core);
+        VSNodeRef *cref = vsapi->propGetNode(out, "clip", 0, 0);
 
         if (interlaced) // interlaced
         {
