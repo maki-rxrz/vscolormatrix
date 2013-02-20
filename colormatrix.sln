@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "colormatrix", "colormatrix.vcxproj", "{18199751-DB0F-4AC4-B8AC-965C38755C2C}"
 EndProject
 Global
